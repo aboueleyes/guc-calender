@@ -46,11 +46,12 @@ class Session:
     def export_to_google_calendar(self):
         rows = []
         start_date = self.next_weekday(datetime.date.today(), self.week_day)
+        print(self)
         end_date = start_date
         start_time = self.slot.start_time
         end_time = self.slot.end_time
         # generate event for each week
-        for _ in range(1, 8):
+        for _ in range(1, 4):
             start_date = start_date + datetime.timedelta(weeks=1)
             end_date = end_date + datetime.timedelta(weeks=1)
             event = f"{self.course_name},{start_date},{start_time},{end_date},{end_time},{self.instructor},{self.location},True"
@@ -109,7 +110,7 @@ class SessionDeserializer:
         session.type = self.get_type(data["type"])
         session.location = data["sessions"][0]["location"]
         session.slot = Slot(data["sessions"][0]["y"] + 1)
-        session.week_day = self.get_day(data["sessions"][0]["x"])
+        session.week_day = self.get_day(data["sessions"][0]["x"] + 1)
         try:
             session.instructor.name = data["sessions"][0]["staff"][0]["name"]
         except IndexError:
@@ -132,7 +133,28 @@ class SessionDeserializer:
             raise ValueError("Invalid type")
 
     def get_day(self, day: int):
-        return (day + 2) % 7
+        # convert the index to a day of the week
+        if day == 1:
+            # saturday
+            return 5
+        elif day == 2:
+            # sunday
+            return 6
+        elif day == 3:
+            # monday
+            return 0
+        elif day == 4:
+            # tuesday
+            return 1
+        elif day == 5:
+            # wednesday
+            return 2
+        elif day == 6:
+            # thursday
+            return 3
+        elif day == 7:
+            # friday
+            return 4
 
 
 def get_json_data(id):
