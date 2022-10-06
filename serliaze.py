@@ -51,7 +51,7 @@ class Session:
         start_time = self.slot.start_time
         end_time = self.slot.end_time
         # generate event for each week
-        for _ in range(1, 4):
+        for _ in range(1, 8):
             start_date = start_date + datetime.timedelta(weeks=1)
             end_date = end_date + datetime.timedelta(weeks=1)
             event = f"{self.course_name},{start_date},{start_time},{end_date},{end_time},{self.instructor},{self.location},True"
