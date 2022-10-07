@@ -56,7 +56,7 @@ class Session:
         for _ in range(0, 11):
             start_date = start_date + datetime.timedelta(weeks=1)
             end_date = end_date + datetime.timedelta(weeks=1)
-            event = f"{self.course_name},{start_date},{start_time},{end_date},{end_time},{self.instructor},{self.location},True"
+            event = f"[{self.type}] {self.course_name},{start_date},{start_time},{end_date},{end_time},{self.instructor},{self.location},True"
             rows.append(event)
         return rows
 
@@ -71,9 +71,12 @@ class Person:
 
 
 class TYPE(Enum):
-    LECTURE = 1
+    LEC = 1
     LAB = 2
-    TUTORIAL = 3
+    TUT = 3
+
+    def __str__(self):
+        return self.name
 
 
 class SessionDeserializer:
@@ -136,58 +139,19 @@ class SessionDeserializer:
             session.course_name = data["course_name"]
             sessions.append(session)
         return sessions
-        # session.course_name = data["course_name"]
-        # session = Session()
-        # session.course_code = data["course_code"]
-        # session.group = data["tut_group"]
-        # session.type = self.get_type(data["type"])
-        # session.location = data["sessions"][0]["location"]
-        # session.slot = Slot(data["sessions"][0]["y"] + 1)
-        # session.week_day = self.get_day(data["sessions"][0]["x"] + 1)
-        # try:
-        #     session.instructor.name = data["sessions"][0]["staff"][0]["name"]
-        # except IndexError:
-        #     session.instructor.name = "Unknown"
-        # try:
-        #     session.instructor.email = data["sessions"][0]["staff"][0]["email"]
-        # except IndexError:
-        #     session.instructor.email = "Unknown"
-        # session.course_name = data["course_name"]
-        # return session
 
     def get_type(self, type: str) -> TYPE:
         if type == "Practical":
             return TYPE.LAB
         elif type == "Lecture":
-            return TYPE.LECTURE
+            return TYPE.LEC
         elif type == "Tutorial":
-            return TYPE.TUTORIAL
+            return TYPE.TUT
         else:
             raise ValueError("Invalid type")
 
     def get_day(self, day: int):
-        # convert the index to a day of the week
-        if day == 1:
-            # saturday
-            return 5
-        elif day == 2:
-            # sunday
-            return 6
-        elif day == 3:
-            # monday
-            return 0
-        elif day == 4:
-            # tuesday
-            return 1
-        elif day == 5:
-            # wednesday
-            return 2
-        elif day == 6:
-            # thursday
-            return 3
-        elif day == 7:
-            # friday
-            return 4
+        return (day + 4) % 7
 
 
 def get_json_data(id):
