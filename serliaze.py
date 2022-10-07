@@ -94,6 +94,16 @@ class SessionDeserializer:
                         "email" : ""
                     }
                 ]
+            },
+            {
+                "x" : 1,
+                "y" : 3,
+                "location" : "BA 1202",
+                "staff" : [
+                    {
+                        "name" : "John Doe",
+                        "email" : ""
+
             }
         ]
     ]
@@ -103,24 +113,45 @@ class SessionDeserializer:
     def __init__(self):
         self.data: dict = {}
 
-    def deserialize(self, data: dict) -> Session:
-        session = Session()
-        session.course_code = data["course_code"]
-        session.group = data["tut_group"]
-        session.type = self.get_type(data["type"])
-        session.location = data["sessions"][0]["location"]
-        session.slot = Slot(data["sessions"][0]["y"] + 1)
-        session.week_day = self.get_day(data["sessions"][0]["x"] + 1)
-        try:
-            session.instructor.name = data["sessions"][0]["staff"][0]["name"]
-        except IndexError:
-            session.instructor.name = "Unknown"
-        try:
-            session.instructor.email = data["sessions"][0]["staff"][0]["email"]
-        except IndexError:
-            session.instructor.email = "Unknown"
-        session.course_name = data["course_name"]
-        return session
+    def deserialize(self, data: dict) -> list[Session]:
+        sessions = []
+        for session_ in data["sessions"]:
+            session = Session()
+            session.course_code = data["course_code"]
+            session.group = data["tut_group"]
+            session.type = self.get_type(data["type"])
+            session.location = session_["location"]
+            session.slot = Slot(session_["y"] + 1)
+            session.week_day = self.get_day(session_["x"] + 1)
+            try:
+                session.instructor.name = session_["staff"][0]["name"]
+            except IndexError:
+                session.instructor.name = "Unknown"
+            try:
+                session.instructor.email = session_["staff"][0]["email"]
+            except IndexError:
+                session.instructor.email = "Unknown"
+            session.course_name = data["course_name"]
+            sessions.append(session)
+        return sessions
+        # session.course_name = data["course_name"]
+        # session = Session()
+        # session.course_code = data["course_code"]
+        # session.group = data["tut_group"]
+        # session.type = self.get_type(data["type"])
+        # session.location = data["sessions"][0]["location"]
+        # session.slot = Slot(data["sessions"][0]["y"] + 1)
+        # session.week_day = self.get_day(data["sessions"][0]["x"] + 1)
+        # try:
+        #     session.instructor.name = data["sessions"][0]["staff"][0]["name"]
+        # except IndexError:
+        #     session.instructor.name = "Unknown"
+        # try:
+        #     session.instructor.email = data["sessions"][0]["staff"][0]["email"]
+        # except IndexError:
+        #     session.instructor.email = "Unknown"
+        # session.course_name = data["course_name"]
+        # return session
 
     def get_type(self, type: str) -> TYPE:
         if type == "Practical":
@@ -174,8 +205,9 @@ if __name__ == "__main__":
         "Subject,Start Date,Start Time,End Date,End Time,Description,Location,Private"
     )
     for d in data:
-        session = session_deserializer.deserialize(d)
-        rows.extend(session.export_to_google_calendar())
+        sessions = session_deserializer.deserialize(d)
+        for session in sessions:
+            rows.extend(session.export_to_google_calendar())
 
     with open(f"guc-schedule-{id}.csv", "w") as f:
         f.write("\n".join(rows))
