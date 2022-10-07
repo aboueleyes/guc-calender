@@ -4,8 +4,8 @@ from enum import Enum
 
 class Slot:
     SLOT_MAP = {
-        1: datetime.time(8, 30),
-        2: datetime.time(10, 15),
+        1: datetime.time(8, 15),
+        2: datetime.time(10, 0),
         3: datetime.time(11, 45),
         4: datetime.time(13, 45),
         5: datetime.time(15, 45),
