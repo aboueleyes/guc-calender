@@ -170,7 +170,7 @@ if __name__ == "__main__":
     rows.append(
         "Subject,Start Date,Start Time,End Date,End Time,Description,Location,Private"
     )
-    for d in data:
+    for d in data['slots']:
         sessions = session_deserializer.deserialize(d)
         for session in sessions:
             rows.extend(session.export_to_google_calendar())
